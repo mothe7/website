@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Image Manager – Mommy's Homemade Website</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Fraunces:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0e0e14;--panel:#161620;--border:#252535;--accent:#6abf73;
+  --accent2:#d4849a;--accent3:#4fb3b3;--text:#e2e0f0;--muted:#6b6a80;
+  --card:#1a1a28;--code-bg:#0b0b11;--yellow:#f4c842;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+
+/* HEADER */
+.header{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:18px 36px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.header-brand{display:flex;align-items:center;gap:14px;}
+.brand-dot{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#6abf73,#1a5c28);display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid rgba(106,191,115,.3);}
+.brand-name{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--text);}
+.brand-sub{font-size:.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;display:block;}
+.header-badge{background:rgba(106,191,115,.1);border:1px solid rgba(106,191,115,.25);color:var(--accent);font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 73px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--panel);border-right:1px solid var(--border);padding:28px 0;}
+.sidebar-label{font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:0 24px;margin-bottom:12px;}
+.page-nav-item{
+  display:flex;align-items:center;gap:12px;padding:13px 24px;cursor:pointer;
+  border-left:3px solid transparent;transition:all .2s;color:var(--muted);font-size:.88rem;font-weight:500;
+}
+.page-nav-item:hover{background:rgba(255,255,255,.03);color:var(--text);}
+.page-nav-item.active{border-left-color:var(--accent);background:rgba(106,191,115,.06);color:var(--accent);}
+.page-nav-item .icon{font-size:1.1rem;width:24px;text-align:center;}
+.page-nav-item .count{margin-left:auto;background:rgba(255,255,255,.07);border-radius:10px;font-size:.68rem;font-weight:700;padding:2px 8px;color:var(--muted);}
+.page-nav-item.active .count{background:rgba(106,191,115,.15);color:var(--accent);}
+
+.sidebar-divider{height:1px;background:var(--border);margin:20px 0;}
+
+.folder-tree{padding:0 24px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);line-height:2;}
+.folder-tree .dir{color:var(--accent3);}
+.folder-tree .file{color:#9a98b8;}
+.folder-tree .active-file{color:var(--accent);font-weight:600;}
+
+/* MAIN */
+.main{padding:36px 40px;}
+.page-header{margin-bottom:32px;}
+.page-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.page-title .emoji{font-size:1.8rem;}
+.page-desc{color:var(--muted);font-size:.87rem;line-height:1.7;}
+
+/* PATH INSTRUCTIONS */
+.instructions-box{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--yellow);padding:18px 22px;margin-bottom:28px;font-size:.84rem;}
+.instructions-box strong{color:var(--yellow);display:block;margin-bottom:8px;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;}
+.instructions-box code{font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.06);padding:2px 6px;font-size:.8rem;color:var(--accent);}
+
+/* IMAGE CARDS GRID */
+.cards-grid{display:grid;gap:20px;}
+
+.img-card{background:var(--card);border:1px solid var(--border);overflow:hidden;transition:border-color .2s;}
+.img-card:hover{border-color:rgba(106,191,115,.3);}
+.img-card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);}
+.img-card-title{font-family:'Fraunces',serif;font-size:.95rem;font-weight:600;}
+.img-card-tag{font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:2px;}
+.tag-spice{background:rgba(252,182,159,.15);color:#fcb69f;}
+.tag-oil{background:rgba(253,203,110,.15);color:#fdcb6e;}
+.tag-herbal{background:rgba(106,191,115,.15);color:var(--accent);}
+.tag-grain{background:rgba(248,187,208,.15);color:#f8bbd0;}
+.tag-hair{background:rgba(212,132,154,.15);color:var(--accent2);}
+.tag-wellness{background:rgba(79,179,179,.15);color:var(--accent3);}
+.tag-photo{background:rgba(106,191,115,.1);color:var(--accent);}
+.tag-founder{background:rgba(212,132,154,.15);color:var(--accent2);}
+
+.img-card-body{padding:20px;}
+.img-editor-label{font-size:.65rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:block;}
+.code-row{display:flex;align-items:stretch;gap:0;}
+.code-input{
+  flex:1;background:var(--code-bg);border:1px solid var(--border);border-right:none;
+  color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.82rem;
+  padding:12px 16px;outline:none;transition:border-color .2s;min-width:0;
+}
+.code-input:focus{border-color:rgba(106,191,115,.5);background:#0d0d15;}
+.code-input::placeholder{color:var(--muted);}
+.copy-btn{
+  background:rgba(106,191,115,.1);border:1px solid rgba(106,191,115,.25);
+  color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.72rem;
+  font-weight:700;padding:0 18px;cursor:pointer;transition:all .2s;white-space:nowrap;
+  letter-spacing:1px;
+}
+.copy-btn:hover{background:rgba(106,191,115,.2);border-color:rgba(106,191,115,.5);}
+.copy-btn.copied{background:rgba(106,191,115,.3);color:#fff;}
+
+.html-snippet{margin-top:14px;}
+.html-snippet pre{
+  background:var(--code-bg);border:1px solid var(--border);
+  font-family:'JetBrains Mono',monospace;font-size:.73rem;
+  color:#9a98b8;padding:14px 16px;overflow-x:auto;line-height:1.8;
+  white-space:pre-wrap;word-break:break-all;
+}
+.html-snippet pre .kw{color:#c792ea;}
+.html-snippet pre .attr{color:var(--accent3);}
+.html-snippet pre .val{color:var(--yellow);}
+.html-snippet pre .cm{color:#4a4960;font-style:italic;}
+.html-snippet pre .hl{color:var(--accent);font-weight:600;}
+
+.img-preview{width:100%;height:160px;object-fit:cover;display:block;background:linear-gradient(135deg,#1a1a28,#0e0e14);}
+.preview-placeholder{width:100%;height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#14141e,#0e0e14);color:var(--muted);font-size:.78rem;letter-spacing:1px;border-bottom:1px solid var(--border);}
+.preview-placeholder .icon{font-size:2.2rem;opacity:.4;}
+
+/* STATUS BAR */
+.status-bar{background:var(--panel);border-top:1px solid var(--border);padding:10px 40px;display:flex;align-items:center;gap:24px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;}
+
+/* TABS */
+.tabs-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.tab{padding:10px 20px;font-size:.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:all .2s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* FOLDER GUIDE */
+.folder-guide{background:var(--card);border:1px solid var(--border);padding:22px 24px;margin-bottom:28px;}
+.folder-guide-title{font-size:.72rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.folder-tree-display{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:2.2;color:#9a98b8;}
+.folder-tree-display .root{color:var(--yellow);font-weight:700;}
+.folder-tree-display .folder{color:var(--accent3);}
+.folder-tree-display .file{color:var(--accent);}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .main{padding:24px 20px;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="brand-dot">🌿</div>
+    <div>
+      <span class="brand-name">Mommy's Homemade</span>
+      <span class="brand-sub">Image Manager &amp; Code Editor</span>
+    </div>
+  </div>
+  <div class="header-badge">4 Pages · Asset Manager</div>
+</header>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-label">Website Pages</div>
+  <div class="page-nav-item active" onclick="switchPage('home',this)">
+    <span class="icon">🏠</span> index.html <span class="count">6</span>
+  </div>
+  <div class="page-nav-item" onclick="switchPage('products',this)">
+    <span class="icon">🛒</span> products.html <span class="count">18</span>
+  </div>
+  <div class="page-nav-item" onclick="switchPage('about',this)">
+    <span class="icon">👩‍🍳</span> about.html <span class="count">2</span>
+  </div>
+  <div class="page-nav-item" onclick="switchPage('contact',this)">
+    <span class="icon">📞</span> contact.html <span class="count">2</span>
+  </div>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-label">Folder Structure</div>
+  <div class="folder-tree">
+    <div class="dir">📁 assets/</div>
+    <div style="padding-left:12px;" class="active-file">📁 home/</div>
+    <div style="padding-left:12px;" class="dir">📁 products/</div>
+    <div style="padding-left:12px;" class="dir">📁 about/</div>
+    <div style="padding-left:12px;" class="dir">📁 contact/</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main" id="mainContent">
+
+  <!-- HOME PAGE -->
+  <div id="page-home">
+    <div class="page-header">
+      <div class="page-title"><span class="emoji">🏠</span> Home Page — index.html</div>
+      <p class="page-desc">Product preview cards &amp; kitchen photo strip. Place your images in the <code style="font-family:JetBrains Mono,monospace;background:rgba(255,255,255,.07);padding:2px 6px;font-size:.8em;color:var(--accent);">assets/home/</code> folder.</p>
+    </div>
+
+    <div class="instructions-box">
+      <strong>📁 How to use</strong>
+      Put your photo files inside the <code>assets/home/</code> folder (create this folder next to your HTML files). Then edit the <code>src</code> paths below to match your file names. The emoji will show automatically if a photo is missing.
+    </div>
+
+    <div class="tabs-bar">
+      <div class="tab active">Product Cards</div>
+      <div class="tab">Photo Strip</div>
+    </div>
+
+    <div class="cards-grid">
+
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🌶️ Spice &amp; Kitchen Essentials</span>
+          <span class="img-card-tag tag-spice">HOME CARD 1</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit this line in index.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/home/spice-essentials.jpg' oninput="updateSnippet(this,'snippet-home-1')" placeholder="assets/home/your-photo.jpg" />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+          <div class="html-snippet">
+            <pre id="snippet-home-1"><span class="cm">&lt;!-- HOME CARD 1 -- change src to your photo path --&gt;</span>
+<span class="kw">&lt;img</span> <span class="attr">src</span>=<span class="val">"assets/home/spice-essentials.jpg"</span>
+     <span class="attr">alt</span>=<span class="val">"Homemade spice powders – red chilli, turmeric, coriander"</span>
+     <span class="attr">onerror</span>=<span class="val">"this.style.display='none';this.nextElementSibling.style.display='flex';"</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;span</span> <span class="attr">class</span>=<span class="val">"prod-card-fb"</span> <span class="attr">style</span>=<span class="val">"display:none;"</span><span class="kw">&gt;</span>🌶️<span class="kw">&lt;/span&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🫙 Cold-Pressed Oils &amp; Pickles</span>
+          <span class="img-card-tag tag-oil">HOME CARD 2</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit this line in index.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/home/oils-pickles.jpg' oninput="updateSnippet(this,'snippet-home-2')" />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+          <div class="html-snippet">
+            <pre id="snippet-home-2"><span class="cm">&lt;!-- HOME CARD 2 -- change src to your photo path --&gt;</span>
+<span class="kw">&lt;img</span> <span class="attr">src</span>=<span class="val">"assets/home/oils-pickles.jpg"</span>
+     <span class="attr">alt</span>=<span class="val">"Cold-pressed sesame and coconut oils, traditional pickles"</span>
+     <span class="attr">onerror</span>=<span class="val">"this.style.display='none';this.nextElementSibling.style.display='flex';"</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;span</span> <span class="attr">class</span>=<span class="val">"prod-card-fb"</span> <span class="attr">style</span>=<span class="val">"display:none;"</span><span class="kw">&gt;</span>🫙<span class="kw">&lt;/span&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🌿 Herbal Wellness Powders</span>
+          <span class="img-card-tag tag-herbal">HOME CARD 3</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit this line in index.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/home/herbal-wellness.jpg' oninput="updateSnippet(this,'snippet-home-3')" />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+          <div class="html-snippet">
+            <pre id="snippet-home-3"><span class="cm">&lt;!-- HOME CARD 3 -- change src to your photo path --&gt;</span>
+<span class="kw">&lt;img</span> <span class="attr">src</span>=<span class="val">"assets/home/herbal-wellness.jpg"</span>
+     <span class="attr">alt</span>=<span class="val">"Herbal wellness powders – curry leaves, amla, moringa"</span>
+     <span class="attr">onerror</span>=<span class="val">"this.style.display='none';this.nextElementSibling.style.display='flex';"</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;span</span> <span class="attr">class</span>=<span class="val">"prod-card-fb"</span> <span class="attr">style</span>=<span class="val">"display:none;"</span><span class="kw">&gt;</span>🌿<span class="kw">&lt;/span&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🌾 Multigrain Atta</span>
+          <span class="img-card-tag tag-grain">HOME CARD 4</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit this line in index.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/home/multigrain-atta.jpg' oninput="updateSnippet(this,'snippet-home-4')" />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+          <div class="html-snippet">
+            <pre id="snippet-home-4"><span class="cm">&lt;!-- HOME CARD 4 -- change src to your photo path --&gt;</span>
+<span class="kw">&lt;img</span> <span class="attr">src</span>=<span class="val">"assets/home/multigrain-atta.jpg"</span>
+     <span class="attr">alt</span>=<span class="val">"Stone-ground multigrain atta – nourishing daily flour"</span>
+     <span class="attr">onerror</span>=<span class="val">"this.style.display='none';this.nextElementSibling.style.display='flex';"</span> <span class="kw">/&gt;</span>
+<span class="kw">&lt;span</span> <span class="attr">class</span>=<span class="val">"prod-card-fb"</span> <span class="attr">style</span>=<span class="val">"display:none;"</span><span class="kw">&gt;</span>🌾<span class="kw">&lt;/span&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">📷 Kitchen Photo Strip — Photo 1</span>
+          <span class="img-card-tag tag-photo">HOME STRIP</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit this line in index.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/home/wooden-chekku-press.jpg' />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">📷 Kitchen Photo Strip — Photo 2</span>
+          <span class="img-card-tag tag-photo">HOME STRIP</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit this line in index.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/home/homemade-products-spread.jpg' />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /cards-grid -->
+  </div><!-- /page-home -->
+
+
+  <!-- PRODUCTS PAGE -->
+  <div id="page-products" style="display:none;">
+    <div class="page-header">
+      <div class="page-title"><span class="emoji">🛒</span> Products Page — products.html</div>
+      <p class="page-desc">18 product images across 5 categories. Place your images in <code style="font-family:JetBrains Mono,monospace;background:rgba(255,255,255,.07);padding:2px 6px;font-size:.8em;color:var(--accent);">assets/products/</code>.</p>
+    </div>
+    <div class="instructions-box">
+      <strong>📁 How to use</strong>
+      Place your photos in <code>assets/products/</code>. The filename must match the <code>src</code> path in each card below. Emoji fallbacks show when a photo is missing.
+    </div>
+    <div class="cards-grid" id="products-cards"></div>
+  </div>
+
+  <!-- ABOUT PAGE -->
+  <div id="page-about" style="display:none;">
+    <div class="page-header">
+      <div class="page-title"><span class="emoji">👩‍🍳</span> About Page — about.html</div>
+      <p class="page-desc">2 photos: kitchen process &amp; founder portrait. Place in <code style="font-family:JetBrains Mono,monospace;background:rgba(255,255,255,.07);padding:2px 6px;font-size:.8em;color:var(--accent);">assets/about/</code>.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🍳 Kitchen / Process Photo</span>
+          <span class="img-card-tag tag-photo">ABOUT PHOTO 1</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit in about.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/about/kitchen-process.jpg' />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+          <div class="html-snippet">
+            <pre><span class="kw">&lt;img</span>
+  <span class="attr">src</span>=<span class="val">"assets/about/kitchen-process.jpg"</span>
+  <span class="attr">alt</span>=<span class="val">"Our kitchen – traditional spice grinding and oil pressing process"</span>
+  <span class="attr">onerror</span>=<span class="val">"this.style.display='none';"</span>
+<span class="kw">/&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">👩 Founder / Portrait Photo</span>
+          <span class="img-card-tag tag-founder">ABOUT PHOTO 2</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit in about.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/about/founder.jpg' />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+          <div class="html-snippet">
+            <pre><span class="kw">&lt;img</span>
+  <span class="attr">src</span>=<span class="val">"assets/about/founder.jpg"</span>
+  <span class="attr">alt</span>=<span class="val">"Founder of Mommy's Homemade Daily Essentials, Tirunelveli"</span>
+  <span class="attr">onerror</span>=<span class="val">"this.style.display='none';"</span>
+<span class="kw">/&gt;</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT PAGE -->
+  <div id="page-contact" style="display:none;">
+    <div class="page-header">
+      <div class="page-title"><span class="emoji">📞</span> Contact Page — contact.html</div>
+      <p class="page-desc">2 ambience / product photos on the contact page. Place in <code style="font-family:JetBrains Mono,monospace;background:rgba(255,255,255,.07);padding:2px 6px;font-size:.8em;color:var(--accent);">assets/contact/</code>.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🍳 Kitchen / Products Shot</span>
+          <span class="img-card-tag tag-photo">CONTACT PHOTO 1</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit in contact.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/contact/contact-kitchen.jpg' />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+        </div>
+      </div>
+      <div class="img-card">
+        <div class="img-card-header">
+          <span class="img-card-title">🌅 Ambient / Product Banner</span>
+          <span class="img-card-tag tag-photo">CONTACT PHOTO 2</span>
+        </div>
+        <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+        <div class="img-card-body">
+          <span class="img-editor-label">Image src path — edit in contact.html</span>
+          <div class="code-row">
+            <input class="code-input" value='assets/contact/contact-ambient.jpg' />
+            <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- STATUS BAR -->
+<footer class="status-bar">
+  <span><span class="status-dot"></span>Image Manager v1.0</span>
+  <span>Folder: <span style="color:var(--accent);font-weight:600;">assets/{page}/filename.jpg</span></span>
+  <span>4 pages · 28 total image slots</span>
+  <span style="margin-left:auto;color:var(--accent);">Mommy's Homemade Daily Essentials</span>
+</footer>
+
+<script>
+// PRODUCTS PAGE IMAGE DATA
+const productsImages = [
+  {title:'🌶️ Red Chilli Powder', tag:'Spice Powder', tagClass:'tag-spice', file:'red-chilli-powder.jpg', fb:'🌶️'},
+  {title:'💛 Turmeric Powder', tag:'Spice Powder', tagClass:'tag-spice', file:'turmeric-powder.jpg', fb:'💛'},
+  {title:'🟤 Coriander Powder', tag:'Spice Powder', tagClass:'tag-spice', file:'coriander-powder.jpg', fb:'🟤'},
+  {title:'🫚 Pepper Powder', tag:'Spice Powder', tagClass:'tag-spice', file:'pepper-powder.jpg', fb:'🫚'},
+  {title:'🍱 Sambar Powder', tag:'Spice Blend', tagClass:'tag-spice', file:'sambar-powder.jpg', fb:'🍱'},
+  {title:'🌾 Multigrain Atta', tag:'Flour', tagClass:'tag-grain', file:'multigrain-atta.jpg', fb:'🌾'},
+  {title:'🌿 Ragi Flour', tag:'Flour', tagClass:'tag-herbal', file:'ragi-flour.jpg', fb:'🌿'},
+  {title:'🫘 Horse Gram Flour', tag:'Flour', tagClass:'tag-grain', file:'horse-gram-flour.jpg', fb:'🫘'},
+  {title:'🟡 Sesame Oil (Nallennai)', tag:'Cold-Pressed Oil', tagClass:'tag-oil', file:'cold-pressed-sesame-oil.jpg', fb:'🟡'},
+  {title:'🫙 Homemade Pickle (Oorugai)', tag:'Condiment', tagClass:'tag-oil', file:'homemade-pickle-oorugai.jpg', fb:'🫙'},
+  {title:'🍶 Coconut Oil', tag:'Cold-Pressed Oil', tagClass:'tag-oil', file:'cold-pressed-coconut-oil.jpg', fb:'🍶'},
+  {title:'🪥 Herbal Tooth Powder', tag:'Oral Care', tagClass:'tag-hair', file:'herbal-tooth-powder.jpg', fb:'🪥'},
+  {title:'🎨 Instant Hair Dye', tag:'Hair Care', tagClass:'tag-hair', file:'instant-hair-dye.jpg', fb:'🎨'},
+  {title:'🌺 Herbal Hair Oil', tag:'Hair Care', tagClass:'tag-hair', file:'herbal-hair-oil.jpg', fb:'🌺'},
+  {title:'🍃 Curry Leaves Powder', tag:'Wellness Powder', tagClass:'tag-wellness', file:'curry-leaves-powder.jpg', fb:'🍃'},
+  {title:'🟢 Amla Powder', tag:'Wellness Powder', tagClass:'tag-wellness', file:'amla-powder.jpg', fb:'🟢'},
+  {title:'🌱 Moringa Leaf Powder', tag:'Wellness Powder', tagClass:'tag-wellness', file:'moringa-powder.jpg', fb:'🌱'},
+  {title:'⚫ Black Sesame Seeds (Ellu)', tag:'Wellness', tagClass:'tag-wellness', file:'black-sesame-seeds.jpg', fb:'⚫'},
+];
+
+function buildProductsCards(){
+  const grid = document.getElementById('products-cards');
+  grid.innerHTML = productsImages.map((p,i)=>`
+    <div class="img-card">
+      <div class="img-card-header">
+        <span class="img-card-title">${p.title}</span>
+        <span class="img-card-tag ${p.tagClass}">${p.tag}</span>
+      </div>
+      <div class="preview-placeholder"><span class="icon">🖼️</span>Photo preview will appear here</div>
+      <div class="img-card-body">
+        <span class="img-editor-label">Image src path — edit in products.html</span>
+        <div class="code-row">
+          <input class="code-input" value="assets/products/${p.file}" />
+          <button class="copy-btn" onclick="copyVal(this)">COPY</button>
+        </div>
+        <div class="html-snippet">
+          <pre><span class="kw">&lt;img</span>
+  <span class="attr">src</span>=<span class="val">"assets/products/${p.file}"</span>
+  <span class="attr">style</span>=<span class="val">"width:100%;height:100%;object-fit:cover;display:block;"</span>
+  <span class="attr">onerror</span>=<span class="val">"this.style.display='none';this.parentElement.querySelector('.prod-img-fb').style.display='flex';"</span>
+<span class="kw">/&gt;</span>
+<span class="kw">&lt;span</span> <span class="attr">class</span>=<span class="val">"prod-img-fb"</span> <span class="attr">style</span>=<span class="val">"display:none;"</span><span class="kw">&gt;</span>${p.fb}<span class="kw">&lt;/span&gt;</span></pre>
+        </div>
+      </div>
+    </div>`).join('');
+}
+buildProductsCards();
+
+// PAGE SWITCHING
+function switchPage(page, el){
+  document.querySelectorAll('.page-nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  ['home','products','about','contact'].forEach(p=>{
+    document.getElementById('page-'+p).style.display = p===page?'':'none';
+  });
+  // update folder tree in sidebar
+  const folders = document.querySelectorAll('.sidebar .folder-tree div');
+  folders.forEach(f=>{
+    f.classList.remove('active-file');
+    if(f.textContent.includes(page)) f.classList.add('active-file');
+  });
+}
+
+// COPY BUTTON
+function copyVal(btn){
+  const input = btn.previousElementSibling;
+  navigator.clipboard.writeText(input.value).then(()=>{
+    btn.textContent='COPIED!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},1800);
+  }).catch(()=>{
+    input.select();document.execCommand('copy');
+    btn.textContent='COPIED!';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},1800);
+  });
+}
+
+// UPDATE SNIPPET on input change
+function updateSnippet(input, snippetId){
+  const el = document.getElementById(snippetId);
+  if(!el) return;
+  const newVal = input.value;
+  // Find the val span containing the src and update it
+  const html = el.innerHTML;
+  const updated = el.innerHTML.replace(/("assets\/home\/[^"]+")/, `"${newVal}"`);
+  el.innerHTML = updated;
+}
+</script>
+</body>
+</html>
